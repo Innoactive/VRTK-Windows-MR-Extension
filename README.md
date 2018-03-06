@@ -22,13 +22,13 @@ Example project structure:
 
 
 
-## What is included?
+## What is included
 
 - Functionality to visualize **Windows Mixed Reality Motion Controllers** in Editor and Build
 - [**glTF**](https://github.com/KhronosGroup/UnityGLTF) which is used to load models at runtime
 - This repository mostly includes altered components from [**Microsoft Mixed Reality Toolkit**](https://github.com/Microsoft/MixedRealityToolkit-Unity) to fit **VRTK**
 
-## Why is this not included in VRTK?
+## Why is this not included in VRTK
 This repository holds a lot of Windows specific code which people who want to use VRTK may not ever use, e.g. when they just want to use Oculus or SteamVR. An SDK in VRTK is always dependent on a vendor SDK package to be installed, but that's about it. For Oculus models to show up you actually need to also import Oculus Avatar, but VRTK works fine without Avatar being imported. The same is done with this repository since there is no native solution by Microsoft.
 
 In a future iteration this repository will also be provided as a unity package.
