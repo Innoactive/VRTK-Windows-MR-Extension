@@ -2,24 +2,27 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using UnityEngine;
+#if UNITY_WSA
+#if UNITY_2017_2_OR_NEWER
+using UnityEngine.XR.WSA.Input;
+#else
+using UnityEngine.VR.WSA.Input;
+#endif
+#endif
 
-namespace VRTK
+namespace VRTK.WindowsMixedReality
 {
     /// <summary>
     /// This script keeps track of the GameObjects for each button on the controller.
     /// It also keeps track of the animation Transforms in order to properly animate according to user input.
     /// </summary>
-    public class WindowsMR_ControllerInfo
+    public class MotionControllerInfo
     {
-#if VRTK_DEFINE_SDK_WINDOWSMR
-        public GameObject ControllerParent;
+        public readonly GameObject ControllerParent;
 
-        public string HomePath;
-        public string SelectPath;
-        public string GraspPath;
-        public string MenuPath;
-        public string TouchpadPath;
-        public string ThumbstickPath;
+#if UNITY_WSA && UNITY_2017_2_OR_NEWER
+        public readonly InteractionSourceHandedness Handedness;
+#endif
 
         private GameObject home;
         private Transform homePressed;
@@ -52,6 +55,14 @@ namespace VRTK
         private Transform touchpadTouchYMin;
         private Transform touchpadTouchYMax;
         private GameObject touchpadTouchVisualizer;
+        private GameObject pointingPose;
+
+        private string homePath;
+        private string selectPath;
+        private string graspPath;
+        private string menuPath;
+        private string touchpadPath;
+        private string thumbstickPath;
 
         // These values are used to determine if a button's state has changed.
         private bool wasGrasped;
@@ -64,6 +75,92 @@ namespace VRTK
         private Vector2 lastTouchpadPosition;
         private double lastSelectPressedAmount;
 
+        public MotionControllerInfo(GameObject controllerParent
+#if UNITY_WSA && UNITY_2017_2_OR_NEWER
+            , InteractionSourceHandedness handedness
+#endif
+            )
+        {
+            ControllerParent = controllerParent;
+#if UNITY_WSA && UNITY_2017_2_OR_NEWER
+            Handedness = handedness;
+#endif
+        }
+
+        public enum ControllerElementEnum
+        {
+            // Controller button elements
+            Home,
+            Menu,
+            Grasp,
+            Thumbstick,
+            Select,
+            Touchpad,
+            // Controller body elements & poses
+            PointingPose
+        }
+
+        public bool TryGetElement(ControllerElementEnum element, out Transform elementTransform)
+        {
+            switch (element)
+            {
+                // control elements
+                case ControllerElementEnum.Home:
+                    if (home != null)
+                    {
+                        elementTransform = home.transform;
+                        return true;
+                    }
+                    break;
+                case ControllerElementEnum.Menu:
+                    if (menu != null)
+                    {
+                        elementTransform = menu.transform;
+                        return true;
+                    }
+                    break;
+                case ControllerElementEnum.Select:
+                    if (select != null)
+                    {
+                        elementTransform = select.transform;
+                        return true;
+                    }
+                    break;
+                case ControllerElementEnum.Grasp:
+                    if (grasp != null)
+                    {
+                        elementTransform = grasp.transform;
+                        return true;
+                    }
+                    break;
+                case ControllerElementEnum.Thumbstick:
+                    if (thumbstickPress != null)
+                    {
+                        elementTransform = thumbstickPress.transform;
+                        return true;
+                    }
+                    break;
+                case ControllerElementEnum.Touchpad:
+                    if (touchpadPress != null)
+                    {
+                        elementTransform = touchpadPress.transform;
+                        return true;
+                    }
+                    break;
+                // body elements & poses
+                case ControllerElementEnum.PointingPose:
+                    if (pointingPose != null)
+                    {
+                        elementTransform = pointingPose.transform;
+                        return true;
+                    }
+                    break;
+            }
+
+            elementTransform = null;
+            return false;
+        }
+
         /// <summary>
         /// Iterates through the Transform array to find specifically named GameObjects.
         /// These GameObjects specify the animation bounds and the GameObject to modify for button,
@@ -71,7 +168,7 @@ namespace VRTK
         /// </summary>
         /// <param name="childTransforms">The transforms of the glTF model.</param>
         /// <param name="visualizerScript">The script containing references to any objects to spawn.</param>
-        public void LoadInfo(Transform[] childTransforms, WindowsMR_ControllerVisualizer visualizerScript)
+        public void LoadInfo(Transform[] childTransforms)
         {
             foreach (Transform child in childTransforms)
             {
@@ -83,6 +180,12 @@ namespace VRTK
                 // visualizer.
                 switch (child.name.ToLower())
                 {
+                    case "touch":
+                        touchpadTouchVisualizer = MotionControllerVisualizer.Instance.SpawnTouchpadVisualizer(child);
+                        break;
+                    case "pointing_pose":
+                        pointingPose = child.gameObject;
+                        break;
                     case "pressed":
                         switch (child.parent.name.ToLower())
                         {
@@ -198,94 +301,10 @@ namespace VRTK
                                 break;
                         }
                         break;
-                    case "touch":
-                        touchpadTouchVisualizer = visualizerScript.SpawnTouchpadVisualizer(child);
-                        break;
                     case "primitive":
                         CreatePathToTransform(child);
                         break;
                 }
-            }
-        }
-
-        private void CreatePathToTransform(Transform transform)
-        {
-            Transform parentTransform = transform.parent;
-            SDK_BaseController.ControllerElements controllerElement = SDK_BaseController.ControllerElements.AttachPoint;
-
-            string path = transform.name;
-
-            while (parentTransform != ControllerParent.transform)
-            {
-                switch (parentTransform.name.ToLower())
-                {
-                    case "home":
-                        controllerElement = SDK_BaseController.ControllerElements.SystemMenu;
-                        break;
-                    case "menu":
-                        controllerElement = SDK_BaseController.ControllerElements.StartMenu;
-                        break;
-                    case "grasp":
-                        controllerElement = SDK_BaseController.ControllerElements.GripLeft;
-                        break;
-                    case "select":
-                        controllerElement = SDK_BaseController.ControllerElements.Trigger;
-                        break;
-                    case "thumbstick_press":
-                        controllerElement = SDK_BaseController.ControllerElements.TouchpadTwo;
-                        break;
-                    case "touchpad_press":
-                        controllerElement = SDK_BaseController.ControllerElements.Touchpad;
-                        break;
-                }
-
-                path = parentTransform.name + "/" + path;
-
-                parentTransform = parentTransform.parent;
-            }
-
-            switch (controllerElement)
-            {
-                case SDK_BaseController.ControllerElements.SystemMenu:
-                    HomePath = path;
-                    break;
-                case SDK_BaseController.ControllerElements.StartMenu:
-                    MenuPath = path;
-                    break;
-                case SDK_BaseController.ControllerElements.GripLeft:
-                    GraspPath = path;
-                    break;
-                case SDK_BaseController.ControllerElements.Trigger:
-                    SelectPath = path;
-                    break;
-                case SDK_BaseController.ControllerElements.TouchpadTwo:
-                    ThumbstickPath = path;
-                    break;
-                case SDK_BaseController.ControllerElements.Touchpad:
-                    TouchpadPath = path;
-                    break;
-            }
-        }
-
-        public string GetPathToVisualizedButton(SDK_BaseController.ControllerElements button)
-        {
-            switch (button)
-            {
-                case SDK_BaseController.ControllerElements.SystemMenu:
-                    return HomePath;
-                case SDK_BaseController.ControllerElements.StartMenu:
-                    return MenuPath;
-                case SDK_BaseController.ControllerElements.GripLeft:
-                case SDK_BaseController.ControllerElements.GripRight:
-                    return GraspPath;
-                case SDK_BaseController.ControllerElements.Trigger:
-                    return SelectPath;
-                case SDK_BaseController.ControllerElements.TouchpadTwo:
-                    return ThumbstickPath;
-                case SDK_BaseController.ControllerElements.Touchpad:
-                    return TouchpadPath;
-                default:
-                    return null;
             }
         }
 
@@ -381,6 +400,95 @@ namespace VRTK
             buttonGameObject.transform.localPosition = newTransform.localPosition;
             buttonGameObject.transform.localRotation = newTransform.localRotation;
         }
-#endif
+
+        public void SetRenderersVisible(bool visible)
+        {
+            MeshRenderer[] renderers = ControllerParent.GetComponentsInChildren<MeshRenderer>();
+            for (int i = 0; i < renderers.Length; i++)
+            {
+                renderers[i].enabled = visible;
+            }
+        }
+
+        private void CreatePathToTransform(Transform transform)
+        {
+            Transform parentTransform = transform.parent;
+            SDK_BaseController.ControllerElements controllerElement = SDK_BaseController.ControllerElements.AttachPoint;
+
+            string path = transform.name;
+
+            while (parentTransform != ControllerParent.transform)
+            {
+                switch (parentTransform.name.ToLower())
+                {
+                    case "home":
+                        controllerElement = SDK_BaseController.ControllerElements.SystemMenu;
+                        break;
+                    case "menu":
+                        controllerElement = SDK_BaseController.ControllerElements.StartMenu;
+                        break;
+                    case "grasp":
+                        controllerElement = SDK_BaseController.ControllerElements.GripLeft;
+                        break;
+                    case "select":
+                        controllerElement = SDK_BaseController.ControllerElements.Trigger;
+                        break;
+                    case "thumbstick_press":
+                        controllerElement = SDK_BaseController.ControllerElements.TouchpadTwo;
+                        break;
+                    case "touchpad_press":
+                        controllerElement = SDK_BaseController.ControllerElements.Touchpad;
+                        break;
+                }
+
+                path = parentTransform.name + "/" + path;
+
+                parentTransform = parentTransform.parent;
+            }
+
+            switch (controllerElement)
+            {
+                case SDK_BaseController.ControllerElements.SystemMenu:
+                    homePath = path;
+                    break;
+                case SDK_BaseController.ControllerElements.StartMenu:
+                    menuPath = path;
+                    break;
+                case SDK_BaseController.ControllerElements.GripLeft:
+                    graspPath = path;
+                    break;
+                case SDK_BaseController.ControllerElements.Trigger:
+                    selectPath = path;
+                    break;
+                case SDK_BaseController.ControllerElements.TouchpadTwo:
+                    thumbstickPath = path;
+                    break;
+                case SDK_BaseController.ControllerElements.Touchpad:
+                    touchpadPath = path;
+                    break;
+            }
+        }
+
+        public string GetPathToVisualizedButton(SDK_BaseController.ControllerElements button)
+        {
+            switch (button)
+            {
+                case SDK_BaseController.ControllerElements.SystemMenu:
+                    return homePath;
+                case SDK_BaseController.ControllerElements.StartMenu:
+                    return menuPath;
+                case SDK_BaseController.ControllerElements.GripLeft:
+                case SDK_BaseController.ControllerElements.GripRight:
+                    return graspPath;
+                case SDK_BaseController.ControllerElements.Trigger:
+                    return selectPath;
+                case SDK_BaseController.ControllerElements.TouchpadTwo:
+                    return thumbstickPath;
+                case SDK_BaseController.ControllerElements.Touchpad:
+                    return touchpadPath;
+                default:
+                    return null;
+            }
+        }
     }
 }
