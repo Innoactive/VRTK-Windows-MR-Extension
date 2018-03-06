@@ -1,5 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
+//
+// ###
+// # Kindly borrowed and extended from Microsoft MRTK (https://github.com/Microsoft/MixedRealityToolkit-Unity) to work with VRTK.
+// ###
 
 using UnityEngine;
 #if UNITY_WSA
