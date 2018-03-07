@@ -407,13 +407,23 @@ namespace VRTK.WindowsMixedReality
 
         private void FinishControllerSetup(GameObject controllerModelGameObject, InteractionSourceHandedness handedness, string dictionaryKey)
         {
-            var parentGameObject = new GameObject
-            {
-                name = handedness + "ControllerModel"
-            };
+            string parentGameObjectName = handedness + "ControllerModel";
+            // Find child with proper name - Name cannot be changed!
+            GameObject parentGameObject = transform.Find("Controller (" + handedness.ToString() + ")/" + parentGameObjectName).gameObject;
 
-            parentGameObject.transform.parent = transform;
+            // if no child, simply create new one
+            if(parentGameObject == null)
+            {
+                parentGameObject = new GameObject
+                {
+                    name = parentGameObjectName
+                };
+                parentGameObject.transform.parent = transform;
+            }
+
             controllerModelGameObject.transform.parent = parentGameObject.transform;
+            controllerModelGameObject.transform.localPosition = Vector3.zero;
+            controllerModelGameObject.transform.localRotation = Quaternion.identity;
 
             var newControllerInfo = new MotionControllerInfo(parentGameObject, handedness);
 
@@ -484,9 +494,17 @@ namespace VRTK.WindowsMixedReality
             switch(handedness)
             {
                 case InteractionSourceHandedness.Left:
-                    return leftControllerModel.GetPathToVisualizedButton(element);
+                    if(leftControllerModel != null)
+                    {
+                        return leftControllerModel.GetPathToVisualizedButton(element);
+                    }
+                    return null;
                 case InteractionSourceHandedness.Right:
-                    return rightControllerModel.GetPathToVisualizedButton(element);
+                    if (rightControllerModel != null)
+                    {
+                        return rightControllerModel.GetPathToVisualizedButton(element);
+                    }
+                    return null;
                 default:
                     return null;
             }
