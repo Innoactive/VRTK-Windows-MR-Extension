@@ -489,12 +489,13 @@ namespace VRTK.WindowsMixedReality
             return touchVisualizer;
         }
 
+#if UNITY_WSA && UNITY_2017_2_OR_NEWER
         public string GetPathToButton(SDK_BaseController.ControllerElements element, InteractionSourceHandedness handedness)
         {
-            switch(handedness)
+            switch (handedness)
             {
                 case InteractionSourceHandedness.Left:
-                    if(leftControllerModel != null)
+                    if (leftControllerModel != null)
                     {
                         return leftControllerModel.GetPathToVisualizedButton(element);
                     }
@@ -509,5 +510,6 @@ namespace VRTK.WindowsMixedReality
                     return null;
             }
         }
+#endif
     }
 }
