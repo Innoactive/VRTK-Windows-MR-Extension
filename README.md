@@ -1,10 +1,8 @@
 # VRTK-Windows-MR-Extension
 Extension for Virtual Reality Toolkit to include **Windows Mixed Reality Controller** visualization.
 
-**NOTE:** This is still work-in-progress and not completely implemented. To use the visualization make sure to add **MotionControllerVisualizer** to the ControllerManager in the WindowsMR SDKSetup. Example scenes will be updated soon.
-
 ## How To Use
-Simply add this repository to your VRTK Unity project which includes the current [development branch](https://github.com/Innoactive/IA-unity-VR-toolkit-VRTK/tree/feature/windows-mixed-reality-refactoring) of **VRTK 3.3.0 alpha with native Windows Mixed Reality support**. It's recommended to add this repository as a submodule outside of the VRTK (submodule) folder.
+Simply add this repository to your VRTK Unity project which includes the current [development branch](https://github.com/Innoactive/IA-unity-VR-toolkit-VRTK/tree/feature/windows-mixed-reality-refactored-rebased) of **VRTK 3.3.0 alpha with native Windows Mixed Reality support**. It's recommended to add this repository as a submodule outside of the VRTK (submodule) folder.
 
 <!--Simply add this repository to your project that also includes [**VRTK**](https://github.com/thestonefox/VRTK).-->
 
@@ -20,7 +18,7 @@ Example project structure:
 ```
 **NOTE:** VRTK will check for a script included in this repository and adds a Scripting Predefine Symbol (_VRTK_DEFINE_WINDOWSMR_CONTROLLER_VISUALIZATION_) if found. If you encounter unexpected behaviour make sure the Predefine Symbol is added in the Player Settings.
 
-
+If missing, add the `MotionControllerVisualization` component to the `ControllerManager` which is part of the WindowsMR SDKSetup.
 
 ## What is included
 
