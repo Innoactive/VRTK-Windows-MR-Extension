@@ -465,6 +465,27 @@ namespace VRTK.WindowsMixedReality
                 return false;
             }
         }
+
+        public string GetPathToButton(SDK_BaseController.ControllerElements element, InteractionSourceHandedness handedness)
+        {
+            switch (handedness)
+            {
+                case InteractionSourceHandedness.Left:
+                    if (leftControllerModel != null)
+                    {
+                        return leftControllerModel.GetPathToVisualizedButton(element);
+                    }
+                    return null;
+                case InteractionSourceHandedness.Right:
+                    if (rightControllerModel != null)
+                    {
+                        return rightControllerModel.GetPathToVisualizedButton(element);
+                    }
+                    return null;
+                default:
+                    return null;
+            }
+        }
 #endif
 
         public GameObject SpawnTouchpadVisualizer(Transform parentTransform)
@@ -487,27 +508,6 @@ namespace VRTK.WindowsMixedReality
             touchVisualizer.transform.localRotation = Quaternion.identity;
             touchVisualizer.SetActive(false);
             return touchVisualizer;
-        }
-
-        public string GetPathToButton(SDK_BaseController.ControllerElements element, InteractionSourceHandedness handedness)
-        {
-            switch(handedness)
-            {
-                case InteractionSourceHandedness.Left:
-                    if(leftControllerModel != null)
-                    {
-                        return leftControllerModel.GetPathToVisualizedButton(element);
-                    }
-                    return null;
-                case InteractionSourceHandedness.Right:
-                    if (rightControllerModel != null)
-                    {
-                        return rightControllerModel.GetPathToVisualizedButton(element);
-                    }
-                    return null;
-                default:
-                    return null;
-            }
         }
     }
 }
