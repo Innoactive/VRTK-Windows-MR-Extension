@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: cc49a7df687e6044d95accc66de2bf14
-timeCreated: 1520516329
+guid: b2c6b498aaf25c849a92b3a5872d288b
+timeCreated: 1523371598
 licenseType: Free
 PluginImporter:
   externalObjects: {}
@@ -19,8 +19,6 @@ PluginImporter:
         Exclude Linux: 1
         Exclude Linux64: 1
         Exclude LinuxUniversal: 1
-        Exclude OSXIntel: 1
-        Exclude OSXIntel64: 1
         Exclude OSXUniversal: 1
         Exclude Win: 1
         Exclude Win64: 1
@@ -69,23 +67,11 @@ PluginImporter:
       settings:
         CPU: None
   - first:
-      Standalone: OSXIntel
-    second:
-      enabled: 0
-      settings:
-        CPU: AnyCPU
-  - first:
-      Standalone: OSXIntel64
-    second:
-      enabled: 0
-      settings:
-        CPU: AnyCPU
-  - first:
       Standalone: OSXUniversal
     second:
       enabled: 0
       settings:
-        CPU: None
+        CPU: AnyCPU
   - first:
       Standalone: Win
     second:
