@@ -3,7 +3,7 @@ Extension for Virtual Reality Toolkit to include **Windows Mixed Reality Control
 
 ## How To Use
 Simply add this repository to your VRTK Unity project which includes the latest [VRTK](https://github.com/thestonefox/VRTK).
-Find a unity package and ZIP in [releases](https://github.com/Innoactive/Unity-GLTF-Windows-MR-Loader/releases) or add this repository as a submodule. 
+Find a unity package and ZIP in [releases](https://github.com/Innoactive/VRTK-Windows-MR-Extension/releases) or add this repository as a submodule. 
 
 **Note:** There are known issues when downloading this repository as a ZIP through the `Clone or download` button. Apparently github marks all DLLs as unsafe so they won't be recognized in Unity.
 
