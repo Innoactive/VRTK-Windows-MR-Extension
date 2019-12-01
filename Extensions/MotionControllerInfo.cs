@@ -28,6 +28,7 @@ namespace VRTK.WindowsMixedReality
         public readonly InteractionSourceHandedness Handedness;
 #endif
 
+        private GameObject trackingMesh;
         private GameObject home;
         private Transform homePressed;
         private Transform homeUnpressed;
@@ -61,6 +62,7 @@ namespace VRTK.WindowsMixedReality
         private GameObject touchpadTouchVisualizer;
         private GameObject pointingPose;
 
+        private string attachPointPath;
         private string homePath;
         private string selectPath;
         private string graspPath;
@@ -184,6 +186,9 @@ namespace VRTK.WindowsMixedReality
                 // visualizer.
                 switch (child.name.ToLower())
                 {
+                    case "tracking_mesh":
+                        trackingMesh = child.gameObject;
+                        break;
                     case "touch":
                         touchpadTouchVisualizer = MotionControllerVisualizer.Instance.SpawnTouchpadVisualizer(child);
                         break;
@@ -417,7 +422,7 @@ namespace VRTK.WindowsMixedReality
         private void CreatePathToTransform(Transform transform)
         {
             Transform parentTransform = transform.parent;
-            SDK_BaseController.ControllerElements controllerElement = SDK_BaseController.ControllerElements.AttachPoint;
+            SDK_BaseController.ControllerElements controllerElement = SDK_BaseController.ControllerElements.Body;
 
             string path = transform.name;
 
@@ -425,6 +430,9 @@ namespace VRTK.WindowsMixedReality
             {
                 switch (parentTransform.name.ToLower())
                 {
+                    case "tracking_mesh":
+                        controllerElement = SDK_BaseController.ControllerElements.AttachPoint;
+                        break;
                     case "home":
                         controllerElement = SDK_BaseController.ControllerElements.SystemMenu;
                         break;
@@ -452,6 +460,9 @@ namespace VRTK.WindowsMixedReality
 
             switch (controllerElement)
             {
+                case SDK_BaseController.ControllerElements.AttachPoint:
+                    attachPointPath = path;
+                    break;
                 case SDK_BaseController.ControllerElements.SystemMenu:
                     homePath = path;
                     break;
@@ -477,6 +488,8 @@ namespace VRTK.WindowsMixedReality
         {
             switch (button)
             {
+                case SDK_BaseController.ControllerElements.AttachPoint:
+                    return attachPointPath;
                 case SDK_BaseController.ControllerElements.SystemMenu:
                     return homePath;
                 case SDK_BaseController.ControllerElements.StartMenu:
