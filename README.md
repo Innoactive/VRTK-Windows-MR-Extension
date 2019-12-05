@@ -24,6 +24,10 @@ Example project structure:
 
 If missing, add the `MotionControllerVisualization` component to the `ControllerManager` which is part of the WindowsMR SDKSetup.
 
+**NOTE:** Issue [#10](https://github.com/Innoactive/VRTK-Windows-MR-Extension/issues/10) is fixed by PR [#12](https://github.com/Innoactive/VRTK-Windows-MR-Extension/pull/12).
+
+> However, because the model is loaded only if the controller is present, errors will still appear until the controller is connected. The fix for these error messages is implemented for VRTK v3 in this commit. However, currently there is no way to merge into the official repo given that v3 has stopped development.
+
 ## What is included
 
 - Functionality to visualize **Windows Mixed Reality Motion Controllers** in Editor and Build
